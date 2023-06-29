@@ -52,9 +52,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception{
-        //Naglasavamo browser-u da ne cache-ira podatke koje dobije u header-ima
         httpSecurity.headers().cacheControl().disable();
-        //Neophodno da ne bi proveravali autentifikaciju kod Preflight zahteva
         httpSecurity.cors();
         httpSecurity.csrf().disable()
                 .sessionManagement()
