@@ -9,6 +9,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -44,6 +45,14 @@ public class User {
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "user_id")
     private Set<Post> posts;
+
+    public User(String username, String password, String email, LocalDate now, String displayName) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.registrationDate = now;
+        this.displayName = displayName;
+    }
 
     public GrantedAuthority getRole(){
         return new SimpleGrantedAuthority("USER_ROLE");
