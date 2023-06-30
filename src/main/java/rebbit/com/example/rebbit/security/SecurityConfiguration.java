@@ -61,11 +61,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/api/users/login").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/users/register").permitAll()
-                .antMatchers(HttpMethod.GET, "/api/posts").permitAll()
-                .antMatchers(HttpMethod.GET, "/api/posts/{id}").permitAll()
-                .antMatchers(HttpMethod.GET, "/api/communities").permitAll()
-                .antMatchers(HttpMethod.GET, "/api/communities/{id}").permitAll()
-                .antMatchers(HttpMethod.GET, "/api/communities/{id}/posts").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/post").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/post/all").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/post/{id}").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/post/communityPosts/{id}").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/community").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/community/create").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/community/{id}").permitAll()
                 .anyRequest().authenticated();
 
         httpSecurity.addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class);

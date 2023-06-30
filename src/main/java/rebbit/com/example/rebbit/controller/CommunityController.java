@@ -13,9 +13,7 @@ import rebbit.com.example.rebbit.service.CommunityService;
 import rebbit.com.example.rebbit.service.UserService;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 @RequestMapping("api/community")
@@ -36,18 +34,22 @@ public class CommunityController {
         community.setName(communityDTO.getName());
         community.setDescription(communityDTO.getDescription());
         User moderator = userService.findByUsername(auth.getName());
-        community.setModerators((Set<Moderator>) moderator);
+
+        Set<User> moderators = new HashSet<>();
+        moderators.add(moderator);
+        community.setModerators(moderators);
+
         Community communityCreated = commService.save(community);
         return ResponseEntity.ok(communityCreated.getId());
     }
 
     @GetMapping(value = "/{id}")
     public ResponseEntity<CommunityDTO>getCommunity(@PathVariable Long id){
-        Community community = commService.findOneById(id);
+        Optional<Community> community = commService.findOneById(id);
         if (community == null){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        CommunityDTO communityDTO = new CommunityDTO(community.getName(), community.getDescription());
+        CommunityDTO communityDTO = new CommunityDTO(community.get().getName(), community.get().getDescription());
         return new ResponseEntity<>(communityDTO, HttpStatus.OK);
     }
 
@@ -59,9 +61,5 @@ public class CommunityController {
             communityDTOS.add(new CommunityDTO(c.getName(),c.getDescription()));
         }
         return new ResponseEntity<>(communityDTOS, HttpStatus.OK);
-
     }
-
-
-
 }

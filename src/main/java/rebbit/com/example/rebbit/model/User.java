@@ -43,7 +43,7 @@ public class User {
     @Column(nullable = false)
     private String displayName;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "user_id")
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private Set<Post> posts;
 
     public User(String username, String password, String email, LocalDate now, String displayName) {

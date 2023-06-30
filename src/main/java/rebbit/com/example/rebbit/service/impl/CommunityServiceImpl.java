@@ -1,12 +1,15 @@
 package rebbit.com.example.rebbit.service.impl;
 
+import org.springframework.stereotype.Service;
 import rebbit.com.example.rebbit.model.Community;
 import rebbit.com.example.rebbit.repository.CommunityRepo;
 import rebbit.com.example.rebbit.service.CommunityService;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 
+@Service
 public class CommunityServiceImpl implements CommunityService {
 
     private final CommunityRepo communityRepo;
@@ -23,8 +26,8 @@ public class CommunityServiceImpl implements CommunityService {
     }
 
     @Override
-    public Community findOneById(Long id) {
-        return null;
+    public Optional<Community> findOneById(Long id) {
+        return communityRepo.findById(id);
     }
 
     @Override

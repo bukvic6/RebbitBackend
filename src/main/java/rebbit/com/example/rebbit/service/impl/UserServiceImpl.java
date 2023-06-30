@@ -1,10 +1,13 @@
 package rebbit.com.example.rebbit.service.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import rebbit.com.example.rebbit.model.User;
 import rebbit.com.example.rebbit.repository.UserRepo;
@@ -16,7 +19,6 @@ import java.util.List;
 @Primary
 @Service
 public class UserServiceImpl implements UserService, UserDetailsService {
-
     private final UserRepo userRepo;
     public UserServiceImpl(UserRepo userRepo){
         this.userRepo = userRepo;
@@ -29,7 +31,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public User findByUsername(String username) {
-        return null;
+        return userRepo.findUserByUsername(username);
     }
 
     @Override
