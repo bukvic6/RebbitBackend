@@ -1,5 +1,7 @@
 package rebbit.com.example.rebbit.service.impl;
 
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
@@ -9,6 +11,7 @@ import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.stereotype.Service;
 
 import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.web.multipart.MultipartFile;
 import rebbit.com.example.rebbit.model.Community;
 import rebbit.com.example.rebbit.model.IndexCommunity;
 import rebbit.com.example.rebbit.repository.CommunityRepo;
@@ -31,11 +34,27 @@ public class CommunityServiceImpl implements CommunityService {
         this.communityRepo = communityRepo;
         this.communityRepoIndex = communityRepoIndex;
     }
+    public static Optional<String> parsePdf(MultipartFile file) {
+        try (var pdfInputStream = file.getInputStream(); var pddDocument = PDDocument.load(pdfInputStream)) {
+            PDFTextStripper pdfStripper = new PDFTextStripper();
+            return Optional.of(pdfStripper.getText(pddDocument));
+        } catch (Exception e) {
+            return Optional.empty();
+        }
+    }
 
     @Override
     @Transactional
-    public Community save(Community community) {
+    public Community save(Community community, MultipartFile pdf) {
         Community saveComm = communityRepo.save(community);
+        IndexCommunity indexCommunity;
+        if(pdf == null){
+            indexCommunity = new IndexCommunity(community);
+        } else{
+            Optional<String> pdfCont = parsePdf(pdf);
+            indexCommunity = new IndexCommunity(saveComm, pdfCont.get(), pdf.getOriginalFilename());
+        }
+        communityRepoIndex.save(indexCommunity);
         return saveComm;
     }
 
@@ -46,7 +65,7 @@ public class CommunityServiceImpl implements CommunityService {
 
     @Override
     public List<Community> getAll() {
-        return null;
+        return communityRepo.findAll();
     }
 
     @Override

@@ -7,7 +7,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import rebbit.com.example.rebbit.dto.CommunityDTO;
+import rebbit.com.example.rebbit.dto.GetCommunityDTO;
 import rebbit.com.example.rebbit.dto.IndexCommunityDTO;
+import rebbit.com.example.rebbit.dto.ResponseCommunity;
 import rebbit.com.example.rebbit.model.Community;
 import rebbit.com.example.rebbit.model.IndexCommunity;
 import rebbit.com.example.rebbit.model.Moderator;
@@ -16,6 +18,7 @@ import rebbit.com.example.rebbit.service.CommunityService;
 import rebbit.com.example.rebbit.service.UserService;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -29,7 +32,7 @@ public class CommunityController {
         this.commService = commService;
         this.userService = userService;
     }
-    @PostMapping("/create")
+    @PostMapping(consumes = {"multipart/form-data"})
     @Secured({"USER_ROLE", "ADMIN", "MODERATOR"})
     public ResponseEntity<Long>createCommunity(@RequestBody CommunityDTO communityDTO){
         Community community = new Community();
@@ -37,26 +40,34 @@ public class CommunityController {
         community.setCreationDate(now);
         community.setName(communityDTO.getName());
         community.setDescription(communityDTO.getDescription());
-        Community communityCreated = commService.save(community);
+        Community communityCreated;
+        if(communityDTO.getPdf() == null){
+           communityCreated = commService.save(community, null);
+        } else {
+           communityCreated = commService.save(community, communityDTO.getPdf());
+
+        }
+
+
         return ResponseEntity.ok(communityCreated.getId());
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<CommunityDTO>getCommunity(@PathVariable Long id){
+    public ResponseEntity<GetCommunityDTO>getCommunity(@PathVariable Long id){
         Optional<Community> community = commService.findOneById(id);
         if (community == null){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        CommunityDTO communityDTO = new CommunityDTO(community.get().getName(), community.get().getDescription());
+        GetCommunityDTO communityDTO = new GetCommunityDTO(community.get().getName(), community.get().getDescription());
         return new ResponseEntity<>(communityDTO, HttpStatus.OK);
     }
 
-    @GetMapping
-    public ResponseEntity<List<CommunityDTO>> getAll(){
+    @GetMapping("/all")
+    public ResponseEntity<List<ResponseCommunity>> getAll(){
         List<Community> communities = commService.getAll();
-        List<CommunityDTO> communityDTOS = new ArrayList<>();
+        List<ResponseCommunity> communityDTOS = new ArrayList<>();
         for (Community  c : communities){
-            communityDTOS.add(new CommunityDTO(c.getName(),c.getDescription()));
+            communityDTOS.add(new ResponseCommunity(c.getId(),c.getName(),c.getDescription()));
         }
         return new ResponseEntity<>(communityDTOS, HttpStatus.OK);
     }

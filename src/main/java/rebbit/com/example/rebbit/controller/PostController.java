@@ -5,9 +5,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import rebbit.com.example.rebbit.dto.IndexPostDTO;
 import rebbit.com.example.rebbit.dto.PostDTO;
 import rebbit.com.example.rebbit.dto.PostResponse;
 import rebbit.com.example.rebbit.model.Community;
+import rebbit.com.example.rebbit.model.IndexPost;
 import rebbit.com.example.rebbit.model.Post;
 import rebbit.com.example.rebbit.model.User;
 import rebbit.com.example.rebbit.service.CommunityService;
@@ -18,6 +20,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/post")
@@ -34,7 +37,7 @@ public class PostController {
     }
 
     @Secured({"USER_ROLE","ADMIN","MODERATOR"})
-    @PostMapping(consumes = "application/json")
+    @PostMapping(consumes = {"multipart/form-data"})
     public ResponseEntity<Long>createPost(@RequestBody PostDTO postDTO, Authentication auth){
         if(postDTO.getCommunityDTO() == null){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -87,5 +90,25 @@ public class PostController {
         }
         return new ResponseEntity<>(new PostResponse(post.getId(),post.getTitle(), post.getText(), post.getCreationDate(),
                 post.getUser().getUsername(),post.getKarma(),post.getCommunity().getName()), HttpStatus.OK);
+    }
+
+
+    @GetMapping("/search")
+    public List<IndexPostDTO> searchPosts(@RequestParam(value = "pdfContent", required = false) String pdfContent,
+                                          @RequestParam(value = "title", required = false) String title,
+                                          @RequestParam(value = "text", required = false) String text) {
+        Iterable<IndexPost> indexPosts = postService.searchPosts(pdfContent, title, text);
+        List<IndexPost> indexPostList = new ArrayList<>();
+        for (IndexPost indexPost : indexPosts) {
+            indexPostList.add(indexPost);
+        }
+        return indexPostList
+                .stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+    }
+
+    private IndexPostDTO toDto(IndexPost indexPost) {
+        return new IndexPostDTO(indexPost.getId(), indexPost.getFileName(), indexPost.getTitle(), indexPost.getText());
     }
 }

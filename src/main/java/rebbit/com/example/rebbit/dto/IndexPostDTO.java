@@ -2,12 +2,15 @@ package rebbit.com.example.rebbit.dto;
 
 import lombok.Data;
 
-import java.time.LocalDate;
-
 @Data
-public class PostDTO {
+public class IndexPostDTO {
+
+    private final Long id;
+
+    private final String fileName;
+
     private final String title;
+
     private final String text;
-    private final Long communityDTO;
 
 }
