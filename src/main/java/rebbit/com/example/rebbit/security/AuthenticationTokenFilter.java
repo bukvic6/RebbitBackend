@@ -22,11 +22,14 @@ public class AuthenticationTokenFilter extends UsernamePasswordAuthenticationFil
     private TokenUtils tokenUtils;
 
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+        System.out.println("______________________________________");
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
         String token = httpServletRequest.getHeader("Authorization");
         if(token != null){
             if(token.startsWith("Bearer ")){
                 token = token.substring(7);
+            } else{
+                System.out.println("Canot find Auth header---------------------------");
             }
         }
 
