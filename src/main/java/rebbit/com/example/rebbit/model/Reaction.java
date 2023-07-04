@@ -14,7 +14,7 @@ public class Reaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long reactionId;
     private ReactionType type;
-    private LocalDate timestamp;
+    private LocalDate time;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")

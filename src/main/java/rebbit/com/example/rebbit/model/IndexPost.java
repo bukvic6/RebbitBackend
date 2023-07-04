@@ -1,6 +1,7 @@
 package rebbit.com.example.rebbit.model;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
@@ -11,6 +12,7 @@ import javax.persistence.Id;
 @Data
 @Document(indexName = "reddit_posts")
 @Setting(settingPath = "analyzers/serbianAnalyzer.json")
+@NoArgsConstructor
 public class IndexPost {
     @Id
     private Long id;

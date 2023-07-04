@@ -36,14 +36,14 @@ public class PostController {
         this.userService = userService;
     }
 
-    @Secured({"USER_ROLE","ADMIN","MODERATOR"})
+    @Secured({"USER_ROLE", "ADMIN", "MODERATOR"})
     @PostMapping(consumes = {"multipart/form-data"})
-    public ResponseEntity<Long>createPost(@RequestBody PostDTO postDTO, Authentication auth){
-        if(postDTO.getCommunityDTO() == null){
+    public ResponseEntity<Long> createPost(@ModelAttribute PostDTO postDTO, Authentication auth) {
+        if (postDTO.getCommunityDTO() == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         Optional<Community> community = communityService.findOneById(postDTO.getCommunityDTO());
-        if(community == null){
+        if (community == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         Post post = new Post();
@@ -55,41 +55,56 @@ public class PostController {
 
         User user = userService.findByUsername(auth.getName());
         post.setUser(user);
-        Post created = postService.createPost(post);
-        System.out.println("----------------------------------------------");
-        System.out.println(user.getEmail());
+        Post created;
+        if (postDTO.getPdf() == null) {
+            created = postService.createPost(post, null);
+        } else {
+            created = postService.createPost(post, postDTO.getPdf());
+        }
         return ResponseEntity.ok(created.getId());
     }
 
     @GetMapping(value = "/all")
-    public ResponseEntity<List<PostResponse>> getAllPosts(){
+    public ResponseEntity<List<PostResponse>> getAllPosts() {
         List<Post> posts = postService.findAll();
         List<PostResponse> postDTOS = new ArrayList<>();
-        for(Post p : posts){
-            postDTOS.add(new PostResponse(p.getId(),p.getTitle(), p.getText(),p.getCreationDate(),p.getUser().getUsername(),
-                    p.getKarma(),p.getCommunity().getName()));
+        for (Post p : posts) {
+            postDTOS.add(new PostResponse(p.getId(), p.getTitle(), p.getText(), p.getCreationDate(), p.getUser().getUsername(),
+                    p.getKarma(), p.getCommunity().getName()));
         }
-        return new ResponseEntity<>(postDTOS,HttpStatus.OK);
+        return new ResponseEntity<>(postDTOS, HttpStatus.OK);
     }
+
     @GetMapping(value = "/communityPosts/{id}")
-    public ResponseEntity<List<PostResponse>> getCommunityPosts(@PathVariable Long id){
+    public ResponseEntity<List<PostResponse>> getCommunityPosts(@PathVariable Long id) {
         List<Post> posts = postService.findAllByCommunity(id);
 
         List<PostResponse> postDTOS = new ArrayList<>();
-        for (Post p : posts){
-            postDTOS.add(new PostResponse(p.getId(),p.getTitle(), p.getText(),p.getCreationDate(),p.getUser().getUsername(),
-                    p.getKarma(),p.getCommunity().getName()));
+        for (Post p : posts) {
+            postDTOS.add(new PostResponse(p.getId(), p.getTitle(), p.getText(), p.getCreationDate(), p.getUser().getUsername(),
+                    p.getKarma(), p.getCommunity().getName()));
         }
-        return new ResponseEntity<>(postDTOS,HttpStatus.OK);
+        return new ResponseEntity<>(postDTOS, HttpStatus.OK);
     }
+
     @GetMapping(value = "/{id}")
-    public ResponseEntity<PostResponse>getPost(@PathVariable Long id){
+    public ResponseEntity<PostResponse> getPost(@PathVariable Long id) {
         Post post = postService.findOneById(id);
-        if (post == null){
+        if (post == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(new PostResponse(post.getId(),post.getTitle(), post.getText(), post.getCreationDate(),
-                post.getUser().getUsername(),post.getKarma(),post.getCommunity().getName()), HttpStatus.OK);
+        return new ResponseEntity<>(new PostResponse(post.getId(), post.getTitle(), post.getText(), post.getCreationDate(),
+                post.getUser().getUsername(), post.getKarma(), post.getCommunity().getName()), HttpStatus.OK);
+    }
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<Void> deletePost(@PathVariable Long id){
+        Post post = postService.findOneById(id);
+        if(post != null){
+            postService.remove(id);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
 

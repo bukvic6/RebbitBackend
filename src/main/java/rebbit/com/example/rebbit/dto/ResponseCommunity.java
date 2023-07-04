@@ -8,6 +8,10 @@ public class ResponseCommunity {
 
     private final String name;
 
+    private final Long countOfRows;
+    private final Long countOfKarma;
+
+
     private final String description;
 
 }

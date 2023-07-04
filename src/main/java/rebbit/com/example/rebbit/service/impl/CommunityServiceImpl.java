@@ -35,9 +35,9 @@ public class CommunityServiceImpl implements CommunityService {
         this.communityRepoIndex = communityRepoIndex;
     }
     public static Optional<String> parsePdf(MultipartFile file) {
-        try (var pdfInputStream = file.getInputStream(); var pddDocument = PDDocument.load(pdfInputStream)) {
+        try (var pdfInputStream = file.getInputStream(); var pdfDocument = PDDocument.load(pdfInputStream)) {
             PDFTextStripper pdfStripper = new PDFTextStripper();
-            return Optional.of(pdfStripper.getText(pddDocument));
+            return Optional.of(pdfStripper.getText(pdfDocument));
         } catch (Exception e) {
             return Optional.empty();
         }
@@ -52,7 +52,8 @@ public class CommunityServiceImpl implements CommunityService {
             indexCommunity = new IndexCommunity(community);
         } else{
             Optional<String> pdfCont = parsePdf(pdf);
-            indexCommunity = new IndexCommunity(saveComm, pdfCont.get(), pdf.getOriginalFilename());
+            System.out.println(community.getId());
+            indexCommunity = new IndexCommunity(community, pdfCont.get(), pdf.getOriginalFilename());
         }
         communityRepoIndex.save(indexCommunity);
         return saveComm;
@@ -84,8 +85,15 @@ public class CommunityServiceImpl implements CommunityService {
                 .withQuery(queryBuilder)
                 .build();
 
-        SearchHits<IndexCommunity> indexCommunities = elasticsearchRestTemplate.search(searchQuery, IndexCommunity.class, IndexCoordinates.of("reddit_community"));
+        SearchHits<IndexCommunity> indexCommunities = elasticsearchRestTemplate.search(searchQuery, IndexCommunity.class, IndexCoordinates.of("rebbit_community"));
         var ids = indexCommunities.map(c -> c.getContent().getId());
         return communityRepoIndex.findAllById(ids);
+    }
+
+    @Override
+    public void remove(Long id) {
+        communityRepoIndex.deleteById(id);
+
+        communityRepo.deleteById(id);
     }
 }

@@ -44,7 +44,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login (@RequestBody LoginDTO loginDTO){
+    public ResponseEntity<String> login(@RequestBody LoginDTO loginDTO) {
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(loginDTO.getUsername(), loginDTO.getPassword());
         Authentication auth = authenticationManager.authenticate(authToken);
         SecurityContextHolder.getContext().setAuthentication(auth);
@@ -57,13 +57,13 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody UserDTO userDTO){
+    public ResponseEntity<?> register(@RequestBody UserDTO userDTO) {
         User user = userService.findByUsername(userDTO.getUsername());
-        if(user != null){
+        if (user != null) {
             return ResponseEntity.badRequest().body("Username taken!");
         }
         String password = passwordEncoder.encode(userDTO.getPassword());
-        User userNew = new User(userDTO.getUsername(),password,userDTO.getEmail(), LocalDate.now(),userDTO.getDisplayName());
+        User userNew = new User(userDTO.getUsername(), password, userDTO.getEmail(), LocalDate.now(), userDTO.getDisplayName());
         return ResponseEntity.ok(userService.register(userNew));
     }
 }

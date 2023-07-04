@@ -2,6 +2,7 @@ package rebbit.com.example.rebbit.model;
 
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
@@ -12,6 +13,7 @@ import javax.persistence.Id;
 @Document(indexName = "rebbit_community")
 @Setting(settingPath = "analyzers/serbianAnalyzer.json")
 @Data
+@NoArgsConstructor
 public class IndexCommunity {
 
     @Id

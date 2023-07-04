@@ -11,4 +11,6 @@ public class IndexCommunityDTO {
     private final String description;
 
     private final String fileName;
+    private final Long count;
+    private final Long karma;
 }

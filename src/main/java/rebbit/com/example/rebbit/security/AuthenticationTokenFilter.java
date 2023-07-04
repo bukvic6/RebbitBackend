@@ -14,6 +14,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+
 public class AuthenticationTokenFilter extends UsernamePasswordAuthenticationFilter {
     @Autowired
     private UserDetailsService userDetailsService;
@@ -25,10 +26,10 @@ public class AuthenticationTokenFilter extends UsernamePasswordAuthenticationFil
         System.out.println("______________________________________");
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
         String token = httpServletRequest.getHeader("Authorization");
-        if(token != null){
-            if(token.startsWith("Bearer ")){
+        if (token != null) {
+            if (token.startsWith("Bearer ")) {
                 token = token.substring(7);
-            } else{
+            } else {
                 System.out.println("Canot find Auth header---------------------------");
             }
         }

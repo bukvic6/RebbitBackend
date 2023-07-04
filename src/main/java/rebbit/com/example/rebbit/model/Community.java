@@ -27,9 +27,4 @@ public class Community {
     @OneToMany(mappedBy = "community", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Post> posts;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(name = "moderator",
-            joinColumns = @JoinColumn(name = "community_id"),
-            inverseJoinColumns = @JoinColumn(name = "moderator_id"))
-    private Set<User> moderators;
 }

@@ -15,4 +15,6 @@ public interface CommunityService {
     List<Community> getAll();
 
     Iterable<IndexCommunity> searchCommunities(String pdfContent, String name, String description);
+
+    void remove(Long id);
 }
